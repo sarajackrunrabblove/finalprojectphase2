@@ -90,7 +90,8 @@ public class OrderService implements BaseService<Order> {
         );
         userRepository.findByUserName(order.getFinalOffer().getExpert().getUserName()).ifPresent(
                 user -> {
-                    user.setCredit(order.getFinalOffer().getOfferedPrice());
+                    float expertNewCredit = user.getCredit() + order.getFinalOffer().getOfferedPrice();
+                    user.setCredit(expertNewCredit);
                     userRepository.save(user);
                 }
         );
