@@ -12,6 +12,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -19,7 +20,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
 @Table(name = "user", schema = "psn1")
 public class User extends BaseModel {
 
@@ -69,14 +69,16 @@ public class User extends BaseModel {
     @Column(name = "is_Active")
     private Boolean isActive = true;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "user_service",
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_service_item",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_id"))
-    private Set<HomeService> expertSkills;
+            inverseJoinColumns = @JoinColumn(name = "service_item_id"))
+    private Set<ServiceItem> expertSkills = new HashSet<>();
 
-    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
-    @JoinColumn(name = "picture_id", referencedColumnName = "id")
-    private UserPicture picture;
+    @Lob
+    @Column(name = "image", columnDefinition = "BLOB")
+    private byte[] image;
 
+    @Column(name = "image_mime_type")
+    private String imageMimeType;
 }

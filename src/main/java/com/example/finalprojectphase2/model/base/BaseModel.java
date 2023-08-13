@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
@@ -24,15 +23,19 @@ public abstract class BaseModel {
     @UpdateTimestamp
     private LocalDateTime modifyDate;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
-    @JoinColumn(name = "creator_user_id", referencedColumnName = "id")
-    private User creatorUser;
+    private Long creatorUser;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
-    @JoinColumn(name = "modifier_user_id", referencedColumnName = "id")
-    private User modifierUser;
+    private Long modifierUser;
 
     @Column(name = "is_Active")
     private Boolean isActive;
+
+    public void setCreatorUser(User creatorUser) {
+        this.creatorUser = creatorUser.getId();
+    }
+
+    public void setModifierUser(User modifierUser) {
+        this.modifierUser = modifierUser.getId();
+    }
 
 }

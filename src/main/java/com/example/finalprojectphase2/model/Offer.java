@@ -4,13 +4,13 @@ import com.example.finalprojectphase2.model.base.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
 @Entity
 @Table(name = "offer", schema = "psn1")
 public class Offer extends BaseModel {
@@ -28,7 +28,10 @@ public class Offer extends BaseModel {
     @Column(name = "offered_starting_time")
     private LocalDateTime offeredStartingTime;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @Column(name = "duration")
+    private Duration duration;
+
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "expert_id", referencedColumnName = "id")
     private User expert;
 

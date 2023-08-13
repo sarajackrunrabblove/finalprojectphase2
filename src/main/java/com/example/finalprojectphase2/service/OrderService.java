@@ -1,6 +1,7 @@
 package com.example.finalprojectphase2.service;
 
 import com.example.finalprojectphase2.model.*;
+import com.example.finalprojectphase2.model.enums.OrderStatus;
 import com.example.finalprojectphase2.repository.OrderRepository;
 import com.example.finalprojectphase2.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,8 @@ public class OrderService implements BaseService<Order> {
         return this.orderRepository.findAll();
     }
 
-    public void newOrder(User customer, HomeService service, String address, Float customerPrice,
+    public void newOrder(User customer, ServiceItem service,
+                         String address, Float customerPrice,
                          String description, LocalDateTime startingTime) {
         Order order = new Order();
         order.setCustomer(customer);
@@ -53,6 +55,11 @@ public class OrderService implements BaseService<Order> {
     }
 
     public Order findByCustomerId(Long customerId) {
-        return this.orderRepository.findByCustomerId(customerId).orElseThrow();
+        return this.orderRepository.findByCustomerId(customerId).orElse(null);
+    }
+
+    public void changeStatusTo(Order order,OrderStatus status){
+        order.setStatus(status);
+        orderRepository.save(order);
     }
 }

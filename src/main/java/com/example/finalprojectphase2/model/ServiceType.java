@@ -3,7 +3,6 @@ package com.example.finalprojectphase2.model;
 import com.example.finalprojectphase2.model.base.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
@@ -12,12 +11,12 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
 @Table(
-        name = "service", schema = "psn1",
+        name = "Service_Type", schema = "psn1",
         uniqueConstraints = @UniqueConstraint(columnNames = {"title"})
 )
-public class HomeService extends BaseModel {
+public class ServiceType extends BaseModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -29,15 +28,7 @@ public class HomeService extends BaseModel {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "base_price")
-    private Float basePrice;
-
-    @ManyToMany(mappedBy = "expertSkills")
-    private Set<User> experts;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @OneToMany(mappedBy = "serviceTypeId", fetch=FetchType.LAZY)
+    private Set<ServiceItem> homeService;
 
 }
-

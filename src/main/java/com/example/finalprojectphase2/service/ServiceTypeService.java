@@ -1,10 +1,10 @@
 package com.example.finalprojectphase2.service;
 
-import com.example.finalprojectphase2.model.Category;
-import com.example.finalprojectphase2.model.HomeService;
+import com.example.finalprojectphase2.model.ServiceType;
+import com.example.finalprojectphase2.model.ServiceItem;
 import com.example.finalprojectphase2.model.User;
 import com.example.finalprojectphase2.model.enums.UserRole;
-import com.example.finalprojectphase2.repository.CategoryRepository;
+import com.example.finalprojectphase2.repository.ServiceTypeRepository;
 import com.example.finalprojectphase2.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,51 +17,50 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class CategoryService implements BaseService<Category> {
-    private final CategoryRepository repository;
-    private final HomeServiceService homeServiceService;
-    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
+public class ServiceTypeService implements BaseService<ServiceType> {
+    private final ServiceTypeRepository repository;
+    private final ServiceItemService homeServiceService;
+    private static final Logger logger = LoggerFactory.getLogger(ServiceTypeService.class);
 
     @Override
-    public Category save(Category category) {
+    public ServiceType save(ServiceType category) {
         return this.repository.save(category);
     }
 
     @Override
-    public void update(Category category) {
+    public void update(ServiceType category) {
         this.repository.save(category);
     }
 
     public void delete(Long id) {
-        Category category = this.repository.findById(id).orElseThrow();
+        ServiceType category = this.repository.findById(id).orElseThrow();
         this.repository.delete(category);
     }
 
-    public void delete(Category category) {
+    public void delete(ServiceType category) {
         this.repository.delete(category);
     }
 
     @Override
-    public Category findById(Long id) {
+    public ServiceType findById(Long id) {
         return this.repository.findById(id).orElseThrow();
     }
 
     @Override
-    public List<Category> findAll() {
+    public List<ServiceType> findAll() {
         return this.repository.findAll();
     }
 
-    public Category findByTitle(String title) {
-        return this.repository.findByTitle(title).orElseThrow();
+    public ServiceType findByTitle(String title) {
+        return this.repository.findByTitle(title).orElse(null);
     }
 
-    @Transactional
-    public Category createCategory(String title, String description, User creatorUser) {
+    public ServiceType createCategory(String title, String description, User creatorUser) {
         if (!creatorUser.getRole().equals(UserRole.ADMIN)) {
             logger.error("You don't have permission to create category!");
             return null;
         }
-        Category category = new Category();
+        ServiceType category = new ServiceType();
         category.setTitle(title);
         category.setDescription(description);
         category.setCreatorUser(creatorUser);
@@ -74,7 +73,7 @@ public class CategoryService implements BaseService<Category> {
             logger.error("You don't have permission to modify category!");
             return;
         }
-        Category category = this.findById(categoryId);
+        ServiceType category = this.findById(categoryId);
         category.setTitle(title);
         category.setDescription(description);
         category.setModifierUser(modifierUser);
@@ -82,7 +81,7 @@ public class CategoryService implements BaseService<Category> {
     }
 
     @Transactional
-    public void addCategoryService(Category category, HomeService service, User modifierUser) {
+    public void addCategoryService(ServiceType category, ServiceItem service, User modifierUser) {
         if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
             logger.error("You don't have permission to add service to category!");
             return;
@@ -93,14 +92,14 @@ public class CategoryService implements BaseService<Category> {
     }
 
     @Transactional
-    public void addCategoryService(Long categoryId, HomeService service, User modifierUser) {
-        Category category = this.findById(categoryId);
+    public void addCategoryService(Long categoryId, ServiceItem service, User modifierUser) {
+        ServiceType category = this.findById(categoryId);
         this.addCategoryService(category, service, modifierUser);
     }
 
     @Transactional
     public void addCategoryService(Long categoryId, Long serviceId, User modifierUser) {
-        HomeService service = this.homeServiceService.findById(serviceId);
+        ServiceItem service = this.homeServiceService.findById(serviceId);
         addCategoryService(categoryId, service, modifierUser);
     }
 }

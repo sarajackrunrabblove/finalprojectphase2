@@ -1,5 +1,6 @@
 package com.example.finalprojectphase2.service;
 
+import com.example.finalprojectphase2.Exception.CustomException;
 import com.example.finalprojectphase2.model.User;
 import com.example.finalprojectphase2.model.enums.UserRole;
 import com.example.finalprojectphase2.model.enums.ExpertStatus;
@@ -69,13 +70,15 @@ public class UserService implements BaseService<User> {
     }
 
     public User findByUserName(String userName) {
-        return this.repository.findByUserName(userName).orElseThrow();
+        return this.repository.findByUserName(userName).orElse(null);
     }
 
     public User createUser(
             String userName, String firstName, String lastName, String email,
-            String password, User creatorUser
+            String password, User creatorUser, byte[] userPicture
     ) {
+        if (userPicture.length > 300000)
+            throw new CustomException("image size is more than 300 KB");
         User user = new User();
         user.setUserName(userName);
         user.setFirstName(firstName);
@@ -84,6 +87,7 @@ public class UserService implements BaseService<User> {
         user.setPassword(password);
         user.setCreatorUser(creatorUser);
         user.setModifierUser(creatorUser);
+        user.setImage(userPicture);
         return this.save(user);
     }
 
@@ -110,7 +114,7 @@ public class UserService implements BaseService<User> {
 
     public User createCustomer(
             String userName, String firstName, String lastName, String email,
-            String password, User creatorUser
+            String password, Float credit, User creatorUser
     ) {
         User user = new User();
         user.setUserName(userName);
@@ -118,6 +122,7 @@ public class UserService implements BaseService<User> {
         user.setLastName(lastName);
         user.setEmail(email);
         user.setPassword(password);
+        user.setCredit(credit);
         user.setRole(UserRole.CUSTOMER);
         user.setCreatorUser(creatorUser);
         user.setModifierUser(creatorUser);

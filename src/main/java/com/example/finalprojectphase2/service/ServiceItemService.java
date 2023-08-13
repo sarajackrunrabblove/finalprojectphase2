@@ -1,11 +1,11 @@
 package com.example.finalprojectphase2.service;
 
-import com.example.finalprojectphase2.model.Category;
-import com.example.finalprojectphase2.model.HomeService;
+import com.example.finalprojectphase2.model.ServiceType;
+import com.example.finalprojectphase2.model.ServiceItem;
 import com.example.finalprojectphase2.model.User;
 import com.example.finalprojectphase2.model.enums.ExpertStatus;
 import com.example.finalprojectphase2.model.enums.UserRole;
-import com.example.finalprojectphase2.repository.HomeServiceRepository;
+import com.example.finalprojectphase2.repository.ServiceItemRepository;
 import com.example.finalprojectphase2.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,52 +17,53 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class HomeServiceService implements BaseService<HomeService> {
-    private final HomeServiceRepository homeServiceRepository;
-    private static final Logger logger = LoggerFactory.getLogger(HomeServiceService.class);
+public class ServiceItemService implements BaseService<ServiceItem> {
+    private final ServiceItemRepository homeServiceRepository;
+    private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(ServiceItemService.class);
     
     @Override
-    public HomeService save(HomeService homeService) {
+    public ServiceItem save(ServiceItem homeService) {
         return this.homeServiceRepository.save(homeService);
     }
 
     @Override
-    public void update(HomeService homeService) {
+    public void update(ServiceItem homeService) {
         this.homeServiceRepository.save(homeService);
     }
 
-    public void delete(HomeService homeService) {
+    public void delete(ServiceItem homeService) {
         this.homeServiceRepository.delete(homeService);
     }
 
     @Override
-    public HomeService findById(Long id) {
+    public ServiceItem findById(Long id) {
         return this.homeServiceRepository.findById(id).orElseThrow();
     }
 
     @Override
-    public List<HomeService> findAll() {
+    public List<ServiceItem> findAll() {
         return this.homeServiceRepository.findAll();
     }
 
-    public HomeService findByTitle(String title) {
-        return this.homeServiceRepository.findByTitle(title).orElseThrow();
+    public ServiceItem findByTitle(String title) {
+        return this.homeServiceRepository.findByTitle(title).orElse(null);
     }
 
-    public void createService(String title, Float basePrice,
-                              String description, Category category,
+    public ServiceItem createService(String title, Float basePrice,
+                              String description, ServiceType category,
                               User creatorUser) {
         if (!creatorUser.getRole().equals(UserRole.ADMIN)) {
             logger.error("You don't have permission to create homeService!");
-            return;
+            return null;
         }
-        HomeService homeService = new HomeService();
+        ServiceItem homeService = new ServiceItem();
         homeService.setTitle(title);
         homeService.setBasePrice(basePrice);
         homeService.setDescription(description);
-        homeService.setCategory(category);
+        homeService.setServiceTypeId(category);
         homeService.setCreatorUser(creatorUser);
-        this.save(homeService);
+        return this.save(homeService);
     }
 
 //    public void createService(String title, Float basePrice,
@@ -72,7 +73,7 @@ public class HomeServiceService implements BaseService<HomeService> {
 //        this.createService(title, basePrice, description, category, creatorUser);
 //    }
 
-    public void addExpert(Long serviceId, User expert, User modifierUser) {
+    public void addExpert(ServiceItem serviceItem, User expert, User modifierUser) {
         if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
             logger.error("You don't have permission to create homeService!");
             return;
@@ -87,10 +88,12 @@ public class HomeServiceService implements BaseService<HomeService> {
             logger.error("You can't add Not Approved expert!");
             return;
         }
-        HomeService homeService = this.findById(serviceId);
-        homeService.setModifierUser(modifierUser);
-        homeService.getExperts().add(expert);
-        this.update(homeService);
+        serviceItem.setModifierUser(modifierUser);
+        serviceItem.getExperts().add(expert);
+        expert.setModifierUser(modifierUser);
+        expert.getExpertSkills().add(serviceItem);
+        this.update(serviceItem);
+        userService.update(expert);
     }
 
 //    public void addExpert(Long serviceId, String expertUserName, User modifierUser) {

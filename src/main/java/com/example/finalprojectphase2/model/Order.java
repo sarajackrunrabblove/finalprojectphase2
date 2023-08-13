@@ -16,7 +16,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
 @Table(name = "order_", schema = "psn1")
 public class Order extends BaseModel {
 
@@ -45,15 +44,15 @@ public class Order extends BaseModel {
     @Column(name = "status")
     private OrderStatus status = OrderStatus.WAITING_FOR_EXPERT_OFFER;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.REMOVE, fetch=FetchType.EAGER)
     @JoinColumn(name = "service_id", referencedColumnName = "id")
-    private HomeService homeService;
+    private ServiceItem homeService;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.REMOVE, fetch=FetchType.LAZY)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private User customer;
 
-    @OneToMany(mappedBy = "order", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "order", fetch=FetchType.EAGER)
     private List<Offer> offers;
 
     @OneToOne(cascade = CascadeType.ALL)

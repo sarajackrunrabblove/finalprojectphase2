@@ -4,20 +4,18 @@ import com.example.finalprojectphase2.model.base.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
 @Table(
-        name = "category", schema = "psn1",
+        name = "Service_Item", schema = "psn1",
         uniqueConstraints = @UniqueConstraint(columnNames = {"title"})
 )
-public class Category extends BaseModel {
-
+public class ServiceItem extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -29,7 +27,15 @@ public class Category extends BaseModel {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "category", fetch=FetchType.LAZY)
-    private Set<HomeService> homeService;
+    @Column(name = "base_price")
+    private Float basePrice;
+
+    @ManyToMany(mappedBy = "expertSkills", fetch = FetchType.EAGER)
+    private Set<User> experts = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "service_type_id")
+    private ServiceType serviceTypeId;
 
 }
+
