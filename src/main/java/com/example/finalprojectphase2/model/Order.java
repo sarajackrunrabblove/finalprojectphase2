@@ -48,7 +48,7 @@ public class Order extends BaseModel {
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     private ServiceItem homeService;
 
-    @OneToOne(cascade = CascadeType.REMOVE, fetch=FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.REMOVE, fetch=FetchType.EAGER)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private User customer;
 

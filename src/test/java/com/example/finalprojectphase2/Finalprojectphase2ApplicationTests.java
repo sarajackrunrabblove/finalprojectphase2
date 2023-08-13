@@ -178,6 +178,10 @@ class Finalprojectphase2ApplicationTests {
         Offer offer = offerList.get(0);
         assertNotNull(offer);
 
+        orderService.setFinalOfferForOrder(order, offer);
+        order = orderService.findByCustomerId(customer.getId());
+        assertEquals(offer.getId(), order.getFinalOffer().getId());
+
         while (LocalDateTime.now().isBefore(offer.getOfferedStartingTime())) {
             logger.info("Waiting for Starting Project");
         }
@@ -191,6 +195,12 @@ class Finalprojectphase2ApplicationTests {
 
         order = orderService.findByCustomerId(customer.getId());
         assertEquals(OrderStatus.DONE, order.getStatus());
+
+        try {
+            orderService.payForExpert(order);
+        } catch (CustomException customException) {
+            fail(customException.getMessage());
+        }
     }
 
     @Test
