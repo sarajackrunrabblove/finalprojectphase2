@@ -1,6 +1,6 @@
 package com.example.finalprojectphase2;
 
-import com.example.finalprojectphase2.Exception.CustomException;
+import com.example.finalprojectphase2.exception.CustomException;
 import com.example.finalprojectphase2.model.*;
 import com.example.finalprojectphase2.model.enums.ExpertStatus;
 import com.example.finalprojectphase2.model.enums.OrderStatus;
@@ -17,13 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.finalprojectphase2.service.UserService.toByteArray;
 import static junit.framework.TestCase.*;
 
 @RunWith(SpringRunner.class)
@@ -179,8 +178,7 @@ class Finalprojectphase2ApplicationTests {
         assertNotNull(offer);
 
         orderService.setFinalOfferForOrder(order, offer);
-        order = orderService.findByCustomerId(customer.getId());
-        assertEquals(offer.getId(), order.getFinalOffer().getId());
+        assertEquals(offer, order.getFinalOffer());
 
         while (LocalDateTime.now().isBefore(offer.getOfferedStartingTime())) {
             logger.info("Waiting for Starting Project");
@@ -197,7 +195,9 @@ class Finalprojectphase2ApplicationTests {
         assertEquals(OrderStatus.DONE, order.getStatus());
 
         try {
+
             orderService.payForExpert(order);
+            ;
         } catch (CustomException customException) {
             fail(customException.getMessage());
         }
@@ -212,22 +212,12 @@ class Finalprojectphase2ApplicationTests {
             InputStream is = getClass().getClassLoader().getResourceAsStream("admin_pic.png");
             assertNotNull(is);
             admin.setImage(toByteArray(is));
-            admin.setImageMimeType("png");
+            admin.setImageType("png");
             admin = userService.save(admin);
             assertNotNull(admin.getImage());
         } catch (Exception e) {
             fail("Unable to get resources");
         }
-    }
-
-    private static byte[] toByteArray(InputStream inputStream) throws Exception {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[300000];
-        int length;
-        while ((length = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, length);
-        }
-        return outputStream.toByteArray();
     }
 
 }

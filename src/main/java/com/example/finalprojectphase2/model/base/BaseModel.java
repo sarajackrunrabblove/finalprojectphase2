@@ -34,8 +34,16 @@ public abstract class BaseModel {
         this.creatorUser = creatorUser.getId();
     }
 
+    public void setCreatorUser(Long creatorUserId) {
+        this.creatorUser = creatorUserId;
+    }
+
     public void setModifierUser(User modifierUser) {
         this.modifierUser = modifierUser.getId();
+    }
+
+    public void setModifierUser(Long modifierUserId) {
+        this.modifierUser = modifierUserId;
     }
 
 }

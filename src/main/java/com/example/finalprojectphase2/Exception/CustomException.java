@@ -1,15 +1,13 @@
-package com.example.finalprojectphase2.Exception;
+package com.example.finalprojectphase2.exception;
 
 public class CustomException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
-    private final String message;
 
     public CustomException(String message) {
-        this.message = message;
+        super(message);
 
     }
     public String getMessage() {
-        return this.message;
+        return this.getLocalizedMessage();
     }
 
 }

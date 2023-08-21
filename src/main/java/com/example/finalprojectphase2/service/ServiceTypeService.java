@@ -4,8 +4,8 @@ import com.example.finalprojectphase2.model.ServiceType;
 import com.example.finalprojectphase2.model.ServiceItem;
 import com.example.finalprojectphase2.model.User;
 import com.example.finalprojectphase2.model.enums.UserRole;
+import com.example.finalprojectphase2.payload.ServiceTypeDTO;
 import com.example.finalprojectphase2.repository.ServiceTypeRepository;
-import com.example.finalprojectphase2.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,17 +17,17 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class ServiceTypeService implements BaseService<ServiceType> {
+public class ServiceTypeService {
     private final ServiceTypeRepository repository;
     private final ServiceItemService homeServiceService;
     private static final Logger logger = LoggerFactory.getLogger(ServiceTypeService.class);
 
-    @Override
+    
     public ServiceType save(ServiceType category) {
         return this.repository.save(category);
     }
 
-    @Override
+    
     public void update(ServiceType category) {
         this.repository.save(category);
     }
@@ -41,12 +41,12 @@ public class ServiceTypeService implements BaseService<ServiceType> {
         this.repository.delete(category);
     }
 
-    @Override
+    
     public ServiceType findById(Long id) {
         return this.repository.findById(id).orElseThrow();
     }
 
-    @Override
+    
     public List<ServiceType> findAll() {
         return this.repository.findAll();
     }
@@ -64,6 +64,18 @@ public class ServiceTypeService implements BaseService<ServiceType> {
         category.setTitle(title);
         category.setDescription(description);
         category.setCreatorUser(creatorUser);
+        return this.save(category);
+    }
+
+    public ServiceType createCategory(ServiceTypeDTO serviceTypeDTO) {
+        if (!serviceTypeDTO.getCreatorUser().getRole().equals(UserRole.ADMIN)) {
+            logger.error("You don't have permission to create category!");
+            return null;
+        }
+        ServiceType category = new ServiceType();
+        category.setTitle(serviceTypeDTO.getTitle());
+        category.setDescription(serviceTypeDTO.getDescription());
+        category.setCreatorUser(serviceTypeDTO.getCreatorUser());
         return this.save(category);
     }
 

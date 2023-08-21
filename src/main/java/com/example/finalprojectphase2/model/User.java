@@ -76,9 +76,9 @@ public class User extends BaseModel {
     private Set<ServiceItem> expertSkills = new HashSet<>();
 
     @Lob
-    @Column(name = "image", columnDefinition = "BLOB")
+    @Column(name = "image", columnDefinition = "BLOB", length = 300000)
     private byte[] image;
 
-    @Column(name = "image_mime_type")
-    private String imageMimeType;
+    @Column(name = "image_type")
+    private String imageType;
 }

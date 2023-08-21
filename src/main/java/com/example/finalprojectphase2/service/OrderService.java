@@ -1,11 +1,11 @@
 package com.example.finalprojectphase2.service;
 
-import com.example.finalprojectphase2.Exception.CustomException;
+import com.example.finalprojectphase2.exception.CustomException;
 import com.example.finalprojectphase2.model.*;
 import com.example.finalprojectphase2.model.enums.OrderStatus;
+import com.example.finalprojectphase2.payload.OrderDTO;
 import com.example.finalprojectphase2.repository.OrderRepository;
 import com.example.finalprojectphase2.repository.UserRepository;
-import com.example.finalprojectphase2.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +15,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class OrderService implements BaseService<Order> {
+public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
 
-    @Override
+    
     public Order save(Order order) {
         return this.orderRepository.save(order);
     }
 
-    @Override
+    
     public void update(Order order) {
         this.orderRepository.save(order);
     }
@@ -33,12 +33,12 @@ public class OrderService implements BaseService<Order> {
         this.orderRepository.delete(order);
     }
 
-    @Override
+    
     public Order findById(Long id) {
         return this.orderRepository.findById(id).orElseThrow();
     }
 
-    @Override
+    
     public List<Order> findAll() {
         return this.orderRepository.findAll();
     }
@@ -55,6 +55,20 @@ public class OrderService implements BaseService<Order> {
         order.setDescription(description);
         order.setStartingTime(startingTime);
         this.save(order);
+    }
+
+
+    public Order newOrder(OrderDTO orderDTO) {
+        Order order = new Order();
+        order.setCustomer(orderDTO.getCustomer());
+        order.setHomeService(orderDTO.getService());
+        order.setAddress(orderDTO.getAddress());
+        order.setCustomerPrice(orderDTO.getCustomerPrice());
+        order.setCreatorUser(orderDTO.getCustomer());
+        order.setDescription(orderDTO.getDescription());
+        order.setStartingTime(orderDTO.getStartingTime());
+        this.save(order);
+        return order;
     }
 
     public Order findByCustomerId(Long customerId) {

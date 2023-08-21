@@ -1,19 +1,17 @@
 package com.example.finalprojectphase2.service;
 
-import com.example.finalprojectphase2.Exception.CustomException;
+import com.example.finalprojectphase2.exception.CustomException;
 import com.example.finalprojectphase2.model.Offer;
 import com.example.finalprojectphase2.model.Order;
 import com.example.finalprojectphase2.model.User;
-import com.example.finalprojectphase2.model.enums.ExpertStatus;
 import com.example.finalprojectphase2.model.enums.OrderStatus;
+import com.example.finalprojectphase2.payload.OfferDTO;
 import com.example.finalprojectphase2.repository.OfferRepository;
-import com.example.finalprojectphase2.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,15 +19,15 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class OfferService implements BaseService<Offer> {
+public class OfferService {
     private final OfferRepository repository;
 
-    @Override
+    
     public Offer save(Offer offer) {
         return this.repository.save(offer);
     }
 
-    @Override
+    
     public void update(Offer offer) {
         this.repository.save(offer);
     }
@@ -38,12 +36,12 @@ public class OfferService implements BaseService<Offer> {
         this.repository.delete(offer);
     }
 
-    @Override
+    
     public Offer findById(Long id) {
         return this.repository.findById(id).orElseThrow();
     }
 
-    @Override
+    
     public List<Offer> findAll() {
         return this.repository.findAll();
     }
@@ -67,6 +65,26 @@ public class OfferService implements BaseService<Offer> {
         offer.setOrder(order);
         offer.setDuration(duration);
         this.save(offer);
+    }
+
+    public Offer addNewOffer(OfferDTO offerDTO) {
+
+        Float basePrice = offerDTO.getOrder().getHomeService().getBasePrice();
+
+        if (basePrice > offerDTO.getOfferedPrice())
+            throw new CustomException("قیمت وارده باید بیشتر از بیس قیمت باشد");
+        if (LocalTime.now().isAfter(LocalTime.from(offerDTO.getOfferedStartingTime())))
+            throw new CustomException("زمان شروع بکار باید بیشتر از زمان حال باشد.");
+        if (!Set.of(OrderStatus.WAITING_FOR_CHOOSING_EXPERT, OrderStatus.WAITING_FOR_EXPERT_OFFER).contains(offerDTO.getOrder().getStatus()))
+            throw new CustomException("وضعیت سفارش در حالت منتخب نمیباشد");
+        Offer offer = new Offer();
+        offer.setOfferedPrice(offerDTO.getOfferedPrice());
+        offer.setOfferedStartingTime(offerDTO.getOfferedStartingTime());
+        offer.setExpert(offerDTO.getExpertUser());
+        offer.setOrder(offer.getOrder());
+        offer.setDuration(offerDTO.getDuration());
+        this.save(offer);
+        return offer;
     }
 
     public Offer findByCustomerId(Long customerId) {
