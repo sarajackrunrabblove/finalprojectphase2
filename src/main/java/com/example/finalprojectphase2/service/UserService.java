@@ -6,6 +6,7 @@ import com.example.finalprojectphase2.model.enums.UserRole;
 import com.example.finalprojectphase2.model.enums.ExpertStatus;
 import com.example.finalprojectphase2.payload.UserDTO;
 import com.example.finalprojectphase2.repository.UserRepository;
+import com.example.finalprojectphase2.repository.specification.UserSpecification;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -84,8 +86,9 @@ public class UserService {
     }
 
     
-    public List<User> findAll() {
-        return this.repository.findAll();
+    public List<User> findAll(UserDTO payload) {
+        Specification<User> specification = UserSpecification.findByFilters(payload);
+        return this.repository.findAll(specification);
     }
 
     public User findByUserName(String userName) {

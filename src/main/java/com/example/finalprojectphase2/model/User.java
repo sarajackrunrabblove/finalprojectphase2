@@ -3,6 +3,7 @@ package com.example.finalprojectphase2.model;
 import com.example.finalprojectphase2.model.base.BaseModel;
 import com.example.finalprojectphase2.model.enums.ExpertStatus;
 import com.example.finalprojectphase2.model.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -11,7 +12,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -61,7 +62,7 @@ public class User extends BaseModel {
 
     @Column(name = "registration_date")
     @CreationTimestamp
-    private LocalDateTime registrationDate;
+    private LocalDate registrationDate;
 
     @Column(name = "credit")
     private Float credit = 0.0F; // اعتبار
@@ -69,13 +70,15 @@ public class User extends BaseModel {
     @Column(name = "is_Active")
     private Boolean isActive = true;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "user_service_item",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "service_item_id"))
     private Set<ServiceItem> expertSkills = new HashSet<>();
 
     @Lob
+    @JsonIgnore
     @Column(name = "image", columnDefinition = "BLOB", length = 300000)
     private byte[] image;
 

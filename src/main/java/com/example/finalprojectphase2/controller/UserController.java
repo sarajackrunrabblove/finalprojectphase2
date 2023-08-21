@@ -2,6 +2,8 @@ package com.example.finalprojectphase2.controller;
 
 import com.example.finalprojectphase2.exception.CustomException;
 import com.example.finalprojectphase2.model.User;
+import com.example.finalprojectphase2.model.enums.ExpertStatus;
+import com.example.finalprojectphase2.model.enums.UserRole;
 import com.example.finalprojectphase2.payload.UserDTO;
 import com.example.finalprojectphase2.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/user")
@@ -25,8 +27,34 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getUser() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<List<User>> getUser(
+            @RequestParam(required = false) String userName,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) UserRole role,
+            @RequestParam(required = false) ExpertStatus status,
+            @RequestParam(required = false) String registrationDate,
+            @RequestParam(required = false) Float credit,
+            @RequestParam(required = false) Long expertSkills
+    ) {
+        UserDTO payload = UserDTO.builder()
+                .userName(userName)
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .role(role)
+                .status(status)
+                .registrationDate(registrationDate)
+                .credit(credit)
+                .expertSkills(expertSkills != null ? Set.of(expertSkills) : null)
+                .build();
+        return ResponseEntity.ok(userService.findAll(payload));
+    }
+
+    @PostMapping
+    public ResponseEntity<List<User>> searchUser(@RequestBody UserDTO payload) {
+        return ResponseEntity.ok(userService.findAll(payload));
     }
 
     @GetMapping(value = "/{id}")
