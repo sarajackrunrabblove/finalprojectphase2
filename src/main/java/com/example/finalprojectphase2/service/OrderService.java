@@ -3,11 +3,15 @@ package com.example.finalprojectphase2.service;
 import com.example.finalprojectphase2.exception.CustomException;
 import com.example.finalprojectphase2.model.*;
 import com.example.finalprojectphase2.model.enums.OrderStatus;
+import com.example.finalprojectphase2.model.enums.PaymentSelection;
 import com.example.finalprojectphase2.payload.OrderDTO;
+import com.example.finalprojectphase2.repository.OfferRepository;
 import com.example.finalprojectphase2.repository.OrderRepository;
 import com.example.finalprojectphase2.repository.UserRepository;
+import com.example.finalprojectphase2.util.CustomerPaymentUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,14 +21,16 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OfferRepository offerRepository;
     private final UserRepository userRepository;
+    private final CustomerPaymentUtil customerPaymentUtil;
 
-    
+
     public Order save(Order order) {
         return this.orderRepository.save(order);
     }
 
-    
+
     public void update(Order order) {
         this.orderRepository.save(order);
     }
@@ -33,12 +39,12 @@ public class OrderService {
         this.orderRepository.delete(order);
     }
 
-    
+
     public Order findById(Long id) {
         return this.orderRepository.findById(id).orElseThrow();
     }
 
-    
+
     public List<Order> findAll() {
         return this.orderRepository.findAll();
     }
@@ -109,5 +115,22 @@ public class OrderService {
                     userRepository.save(user);
                 }
         );
+    }
+
+    public ResponseEntity<Object> payForExperts(Order order, PaymentSelection paymentSelection) {
+        if (paymentSelection.equals(PaymentSelection.PayWithCredit)) {
+            return customerPaymentUtil.payWithCredit(order);
+        }
+        return customerPaymentUtil.payOnline(order);
+    }
+
+    public List<Offer> showOffersByPriceAndExpertRate(Long orderId, Float price, Integer expertRate) {
+        return offerRepository.findAllByOfferedPriceOrExpertRateAndOrderId(price, expertRate, orderId);
+    }
+
+    public List<Order> showOffersByExpert(Long expertId) {
+
+        return orderRepository.findAllByExpertId(expertId, OrderStatus.WAITING_FOR_EXPERT_OFFER);
+
     }
 }
