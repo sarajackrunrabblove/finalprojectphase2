@@ -36,19 +36,20 @@ public class UserController {
             @RequestParam(required = false) ExpertStatus status,
             @RequestParam(required = false) String registrationDate,
             @RequestParam(required = false) Float credit,
+            @RequestParam(required = false) Integer rate,
             @RequestParam(required = false) Long expertSkills
     ) {
-        UserDTO payload = UserDTO.builder()
-                .userName(userName)
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .role(role)
-                .status(status)
-                .registrationDate(registrationDate)
-                .credit(credit)
-                .expertSkills(expertSkills != null ? Set.of(expertSkills) : null)
-                .build();
+        UserDTO payload = new UserDTO();
+        payload.setUserName(userName);
+        payload.setFirstName(firstName);
+        payload.setLastName(lastName);
+        payload.setEmail(email);
+        payload.setRole(role);
+        payload.setStatus(status);
+        payload.setRegistrationDate(registrationDate);
+        payload.setCredit(credit);
+        payload.setRate(rate);
+        payload.setExpertSkills(expertSkills != null ? Set.of(expertSkills) : null);
         return ResponseEntity.ok(userService.findAll(payload));
     }
 
@@ -61,15 +62,15 @@ public class UserController {
     public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
         User user = userService.findById(id);
         if (user == null)
-            throw new CustomException("User not found");
+            throw new CustomException("User not found", HttpStatus.NOT_FOUND);
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping(value = "get-by-username/{username}")
+    @GetMapping(value = "find-by-username/{username}")
     public ResponseEntity<User> getUser(@PathVariable("username") String username) {
         User user = userService.findByUserName(username);
         if (user == null)
-            throw new CustomException("User not found");
+            throw new CustomException("User not found", HttpStatus.NOT_FOUND);
         return ResponseEntity.ok(user);
     }
 
@@ -105,12 +106,44 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping(value = "/add-credit/{id}")
+    public ResponseEntity<?> addCredit(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) {
+        Map<String, Object> response = new HashMap<>();
+        //todo: add credit from payment service
+        response.put("user", userService.addCredit(id, userDTO));
+        response.put("message", "Expert approved successfully");
+        return ResponseEntity.ok(response);
+    }
 
     @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         userService.deleteById(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("User deleted successfully");
+    }
+
+    @PutMapping(value = "/change-role/{id}")
+    public ResponseEntity<?> changeRole(@PathVariable("id") Long id,
+                                        @RequestBody UserDTO user) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", userService.changeRole(id, user));
+        response.put("message", "User updated successfully");
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @PutMapping(value = "/change-password/{id}")
+    public ResponseEntity<?> changePassword(@PathVariable("id") Long id,
+                                        @RequestBody UserDTO user) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", userService.changePassword(id, user));
+        response.put("message", "User password updated successfully");
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
     }
 
     @PutMapping(value = "/update/{id}")
@@ -140,7 +173,7 @@ public class UserController {
 
         User user = userService.findById(userId);
         if (user.getImage() == null)
-            throw new CustomException("Image not found");
+            throw new CustomException("Image not found", HttpStatus.NOT_FOUND);
 
         return ResponseEntity
                 .ok()

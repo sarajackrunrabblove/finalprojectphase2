@@ -15,22 +15,22 @@ public class ServiceTypeController {
 
     private final ServiceTypeService serviceTypeService;
 
-    @PostMapping(value = "create-serviceType")
+    @PostMapping(value = "/create-service-type")
     public ResponseEntity<?> createServiceType(ServiceTypeDTO serviceType) {
         return ResponseEntity.ok(serviceTypeService.createCategory(serviceType));
     }
 
-    @GetMapping(value = "get-serviceType")
+    @GetMapping(value = "/get-service-type")
     public ResponseEntity<?> getServiceType(String serviceTypeTitle) {
         return ResponseEntity.ok(serviceTypeService.findByTitle(serviceTypeTitle));
     }
 
-    @DeleteMapping(value = "delete-serviceType")
+    @DeleteMapping(value = "/delete-service-type")
     public void deleteServiceType(String serviceTypeTitle) {
         serviceTypeService.delete(serviceTypeService.findByTitle(serviceTypeTitle));
     }
 
-    @PostMapping(value = "update-serviceType")
+    @PostMapping(value = "/update-service-type")
     public void updateServiceType(ServiceType serviceType) {
         serviceTypeService.update(serviceType);
     }

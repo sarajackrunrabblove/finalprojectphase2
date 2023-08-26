@@ -16,7 +16,7 @@ public class UserSpecification {
         return (user, cq, cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (payload.getFirstName() != null)
-                predicates.add(cb.like(user.get("userName"), "%" + payload.getFirstName() + "%"));
+                predicates.add(cb.like(user.get("firstName"), "%" + payload.getFirstName() + "%"));
 
             if (payload.getLastName() != null)
                 predicates.add(cb.like(user.get("lastName"), "%" + payload.getLastName() + "%"));
@@ -41,6 +41,9 @@ public class UserSpecification {
 
             if (payload.getCredit() != null)
                 predicates.add(cb.greaterThanOrEqualTo(user.get("credit"), payload.getCredit()));
+
+            if (payload.getRate() != null)
+                predicates.add(cb.greaterThanOrEqualTo(user.get("rate"), payload.getRate()));
 
             if (payload.getExpertSkills() != null && !payload.getExpertSkills().isEmpty())
                 predicates.add(user.join("expertSkills")

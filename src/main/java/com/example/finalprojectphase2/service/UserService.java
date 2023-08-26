@@ -5,6 +5,7 @@ import com.example.finalprojectphase2.model.User;
 import com.example.finalprojectphase2.model.enums.UserRole;
 import com.example.finalprojectphase2.model.enums.ExpertStatus;
 import com.example.finalprojectphase2.payload.UserDTO;
+import com.example.finalprojectphase2.repository.OfferRepository;
 import com.example.finalprojectphase2.repository.UserRepository;
 import com.example.finalprojectphase2.repository.specification.UserSpecification;
 import jakarta.validation.ConstraintViolation;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ import java.util.Set;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserService {
     private final UserRepository repository;
+    private final OfferRepository offerRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     
@@ -43,7 +46,7 @@ public class UserService {
                 stringBuilder.append(constraintViolation.getMessage()).append(", ");
             }
             // todo: handle exception
-            throw new CustomException(stringBuilder.toString());
+            throw new CustomException(stringBuilder.toString(), HttpStatus.BAD_REQUEST);
         } else {
             return this.repository.save(user);
         }
@@ -51,25 +54,13 @@ public class UserService {
     
     public User update(Long userId, UserDTO payload) {
         User user = this.findById(userId);
-        user.setUserName(payload.getUserName());
-        user.setFirstName(payload.getFirstName());
-        user.setLastName(payload.getLastName());
-        user.setEmail(payload.getEmail());
-        user.setPassword(payload.getPassword());
+        if (payload.getUserName() != null) user.setUserName(payload.getUserName());
+        if (payload.getFirstName() != null) user.setFirstName(payload.getFirstName());
+        if (payload.getLastName() != null) user.setLastName(payload.getLastName());
+        if (payload.getEmail() != null) user.setEmail(payload.getEmail());
+//        if (changePasswordValidation(user, payload)) user.setPassword(payload.getNewPassword());
 
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        Validator validator = validatorFactory.getValidator();
-        Set<ConstraintViolation<User>> constraintViolationsInvalidUser = validator.validate(user);
-        if (!constraintViolationsInvalidUser.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (ConstraintViolation<User> constraintViolation : constraintViolationsInvalidUser) {
-                logger.error(constraintViolation.getMessage());
-                stringBuilder.append(constraintViolation.getMessage()).append(", ");
-            }
-            throw new CustomException(stringBuilder.toString());
-        } else {
-            return this.repository.save(user);
-        }
+        return this.save(user);
     }
 
     public void delete(User user) {
@@ -192,19 +183,20 @@ public class UserService {
         return this.save(user);
     }
 
-    public void changeRole(User user, UserRole role, User modifierUser) {
-        if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
-            logger.error("You don't have permission to change user role!");
-            return;
-        }
-        user.setRole(role);
-        user.setModifierUser(modifierUser);
-        this.save(user);
+    public User changeRole(User user, UserDTO userDTO) {
+        //todo: handle admin as modifierUser
+//        if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
+//            logger.error("You don't have permission to change user role!");
+//            return;
+//        }
+        user.setRole(userDTO.getRole());
+//        user.setModifierUser(modifierUser);
+        return this.save(user);
     }
 
-    public void changeRole(String userName, UserRole role, User modifierUser) {
-        User load = this.findByUserName(userName);
-        this.changeRole(load, role, modifierUser);
+    public User changeRole(Long id, UserDTO userDTO) {
+        User load = this.findById(id);
+        return this.changeRole(load, userDTO);
     }
 
     public User changeStatus(User user, ExpertStatus status) {
@@ -227,27 +219,35 @@ public class UserService {
         return this.changeStatus(id, ExpertStatus.APPROVED);
     }
 
-    public void changePassword(User user, String newPassword, User modifierUser) {
+    public User addCredit(Long id, UserDTO userDTO) {
+        //todo: add credit from payment service
+        User user = this.findById(id);
+        user.setCredit(userDTO.getCredit());
+        return this.save(user);
+    }
+
+    public User changePassword(User user, UserDTO userDTO) {
         //todo
 //        if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
 //            logger.error("You don't have permission to change user status password!");
 //            return;
 //        }
-        user.setPassword(newPassword);
-        user.setModifierUser(modifierUser);
-        this.save(user);
+        changePasswordValidation(user, userDTO);
+        user.setPassword(userDTO.getNewPassword());
+//        user.setModifierUser(modifierUser);
+        return this.save(user);
     }
 
-    public void changePassword(Long userId, String newPassword) {
+    public User changePassword(Long userId, UserDTO userDTO) {
         //get user from session
         User load = this.findById(userId);
-        this.changePassword(load, newPassword, null);
+        return this.changePassword(load, userDTO);
     }
 
     @Transactional
     public void changeUserPicture(Long userId, MultipartFile userPicture) {
         if (userPicture.getSize() > 300000L)
-            throw new CustomException("image size is more than 300 KB");
+            throw new CustomException("image size is more than 300 KB", HttpStatus.BAD_REQUEST);
         try {
             User load = this.findById(userId);
             load.setImage(toByteArray(userPicture.getInputStream()));
@@ -258,6 +258,13 @@ public class UserService {
         }
     }
 
+    public void setExpertRateAvg(Long expertId) {
+        User expert = this.findById(expertId);
+        Integer expertRateAvg = offerRepository.getExpertRateAvg(expertId);
+        expert.setRate(expertRateAvg);
+        this.save(expert);
+    }
+
     public static byte[] toByteArray(InputStream inputStream) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[300000];
@@ -266,5 +273,18 @@ public class UserService {
             outputStream.write(buffer, 0, length);
         }
         return outputStream.toByteArray();
+    }
+
+    private static void changePasswordValidation(User user, UserDTO payload) {
+        if (payload.getPassword() == null)
+            throw new CustomException("old password is required", HttpStatus.BAD_REQUEST);
+        if (payload.getNewPassword() == null)
+            throw new CustomException("new password is required", HttpStatus.BAD_REQUEST);
+        if (payload.getConfirmPassword() == null)
+            throw new CustomException("confirm password is required", HttpStatus.BAD_REQUEST);
+        if (!user.getPassword().equals(payload.getPassword()))
+            throw new CustomException("old password is not correct", HttpStatus.BAD_REQUEST);
+        if (!payload.getNewPassword().equals(payload.getConfirmPassword()))
+            throw new CustomException("new password and confirm password are not equal", HttpStatus.BAD_REQUEST);
     }
 }

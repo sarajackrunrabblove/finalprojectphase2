@@ -38,14 +38,16 @@ public class OrderController {
         orderService.update(order);
     }
 
-    @GetMapping(value = "/showOffersByPriceAndExpertRate ")
-    public List<Offer> showOffersByPriceAndExpertRate(@RequestParam(required = true) Long orderId
-            , @RequestParam(required = false) Float price,
-                                                      @RequestParam(required = false) Integer expertRate) {
+    @GetMapping(value = "/showOffersByPriceAndExpertRate")
+    public List<Offer> showOffersByPriceAndExpertRate(
+            @RequestParam(required = true) Long orderId,
+            @RequestParam(required = false) Float price,
+            @RequestParam(required = false) Integer expertRate
+    ) {
         return orderService.showOffersByPriceAndExpertRate(orderId, price, expertRate);
     }
 
-    @GetMapping(value = "/showOffersByExpert ")
+    @GetMapping(value = "/showOffersByExpert")
     public List<Order> showOffersByExpert(@RequestParam Long expertId) {
         return orderService.showOffersByExpert(expertId);
     }

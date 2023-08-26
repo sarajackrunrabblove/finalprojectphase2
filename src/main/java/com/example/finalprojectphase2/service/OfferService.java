@@ -9,6 +9,7 @@ import com.example.finalprojectphase2.payload.OfferDTO;
 import com.example.finalprojectphase2.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -53,11 +54,11 @@ public class OfferService {
         Float basePrice = order.getHomeService().getBasePrice();
 
         if (basePrice > offeredPrice)
-            throw new CustomException("قیمت وارده باید بیشتر از بیس قیمت باشد");
+            throw new CustomException("قیمت وارده باید بیشتر از بیس قیمت باشد", HttpStatus.BAD_REQUEST);
         if (LocalTime.now().isAfter(LocalTime.from(offeredStartingTime)))
-            throw new CustomException("زمان شروع بکار باید بیشتر از زمان حال باشد.");
+            throw new CustomException("زمان شروع بکار باید بیشتر از زمان حال باشد.", HttpStatus.BAD_REQUEST);
         if (!Set.of(OrderStatus.WAITING_FOR_CHOOSING_EXPERT, OrderStatus.WAITING_FOR_EXPERT_OFFER).contains(order.getStatus()))
-            throw new CustomException("وضعیت سفارش در حالت منتخب نمیباشد");
+            throw new CustomException("وضعیت سفارش در حالت منتخب نمیباشد", HttpStatus.BAD_REQUEST);
         Offer offer = new Offer();
         offer.setOfferedPrice(offeredPrice);
         offer.setOfferedStartingTime(offeredStartingTime);
@@ -72,11 +73,11 @@ public class OfferService {
         Float basePrice = offerDTO.getOrder().getHomeService().getBasePrice();
 
         if (basePrice > offerDTO.getOfferedPrice())
-            throw new CustomException("قیمت وارده باید بیشتر از بیس قیمت باشد");
+            throw new CustomException("قیمت وارده باید بیشتر از بیس قیمت باشد", HttpStatus.BAD_REQUEST);
         if (LocalTime.now().isAfter(LocalTime.from(offerDTO.getOfferedStartingTime())))
-            throw new CustomException("زمان شروع بکار باید بیشتر از زمان حال باشد.");
+            throw new CustomException("زمان شروع بکار باید بیشتر از زمان حال باشد.", HttpStatus.BAD_REQUEST);
         if (!Set.of(OrderStatus.WAITING_FOR_CHOOSING_EXPERT, OrderStatus.WAITING_FOR_EXPERT_OFFER).contains(offerDTO.getOrder().getStatus()))
-            throw new CustomException("وضعیت سفارش در حالت منتخب نمیباشد");
+            throw new CustomException("وضعیت سفارش در حالت منتخب نمیباشد", HttpStatus.BAD_REQUEST);
         Offer offer = new Offer();
         offer.setOfferedPrice(offerDTO.getOfferedPrice());
         offer.setOfferedStartingTime(offerDTO.getOfferedStartingTime());

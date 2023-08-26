@@ -3,7 +3,9 @@ package com.example.finalprojectphase2.model;
 import com.example.finalprojectphase2.model.base.BaseModel;
 import com.example.finalprojectphase2.model.enums.ExpertStatus;
 import com.example.finalprojectphase2.model.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -21,6 +23,9 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @Table(name = "user", schema = "psn1")
 public class User extends BaseModel {
 
@@ -44,6 +49,7 @@ public class User extends BaseModel {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @NotBlank
     @Pattern(
             regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$",
@@ -70,18 +76,21 @@ public class User extends BaseModel {
     @Column(name = "is_Active")
     private Boolean isActive = true;
 
-    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "user_service_item",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "service_item_id"))
     private Set<ServiceItem> expertSkills = new HashSet<>();
 
+    @Column(name = "rate")
+    private Integer rate = 0;
+
     @Lob
     @JsonIgnore
     @Column(name = "image", columnDefinition = "BLOB", length = 300000)
     private byte[] image;
 
+    @JsonIgnore
     @Column(name = "image_type")
     private String imageType;
 }

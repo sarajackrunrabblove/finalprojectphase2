@@ -1,8 +1,6 @@
 package com.example.finalprojectphase2.util;
 
-import com.example.finalprojectphase2.exception.CustomException;
 import com.example.finalprojectphase2.model.Order;
-import com.example.finalprojectphase2.model.User;
 import com.example.finalprojectphase2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

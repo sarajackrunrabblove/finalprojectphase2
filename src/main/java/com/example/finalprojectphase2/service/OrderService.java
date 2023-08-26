@@ -11,6 +11,7 @@ import com.example.finalprojectphase2.repository.UserRepository;
 import com.example.finalprojectphase2.util.CustomerPaymentUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OfferRepository offerRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final CustomerPaymentUtil customerPaymentUtil;
 
 
@@ -96,10 +98,22 @@ public class OrderService {
         );
     }
 
+    // todo: add controller and test
+    public void rateExpertFinalOffer(Order order, Integer rate, String reviewDescription) {
+        orderRepository.findByCustomerId(order.getCustomer().getId()).ifPresent(
+                customerOrder -> {
+                    customerOrder.getFinalOffer().setExpertRate(rate);
+                    customerOrder.getFinalOffer().setReviewDescription(reviewDescription);
+                    orderRepository.save(customerOrder);
+                    userService.setExpertRateAvg(customerOrder.getFinalOffer().getExpert().getId());
+                }
+        );
+    }
+
     public void payForExpert(Order order) {
         Float customerCredit = order.getCustomer().getCredit();
         if (customerCredit < order.getFinalOffer().getOfferedPrice())
-            throw new CustomException("  وجه اعتبار شما کمتر ازمبلغ پرداختی میباشد لطفا ابتدا اعتبار خود را افزایش دهید");
+            throw new CustomException("  وجه اعتبار شما کمتر ازمبلغ پرداختی میباشد لطفا ابتدا اعتبار خود را افزایش دهید", HttpStatus.BAD_REQUEST);
 
         float finalCustomerCredit = customerCredit - order.getFinalOffer().getOfferedPrice();
         userRepository.findByUserName(order.getCustomer().getUserName()).ifPresent(

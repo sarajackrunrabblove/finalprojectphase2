@@ -8,7 +8,6 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
@@ -17,10 +16,13 @@ public class UserDTO {
     private String lastName;
     private String email;
     private String password;
+    private String newPassword;
+    private String confirmPassword;
     private UserRole role;
     private ExpertStatus status;
     private String registrationDate;
     private Float credit;
+    private Integer rate;
     private Set<Long> expertSkills;
     private Long creatorUserId;
     private Long modifierUserId;

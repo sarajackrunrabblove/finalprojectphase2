@@ -1,6 +1,8 @@
 package com.example.finalprojectphase2.model;
 
 import com.example.finalprojectphase2.model.base.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @Table(name = "offer", schema = "psn1")
 public class Offer extends BaseModel {
     @Id

@@ -3,6 +3,8 @@ package com.example.finalprojectphase2.model;
 
 import com.example.finalprojectphase2.model.base.BaseModel;
 import com.example.finalprojectphase2.model.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,6 +18,9 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @Table(name = "order_", schema = "psn1")
 public class Order extends BaseModel {
 

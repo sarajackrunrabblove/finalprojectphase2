@@ -61,7 +61,7 @@ public class ServiceItemService {
         homeService.setTitle(title);
         homeService.setBasePrice(basePrice);
         homeService.setDescription(description);
-        homeService.setServiceTypeId(category);
+        homeService.setServiceType(category);
         homeService.setCreatorUser(creatorUser);
         return this.save(homeService);
     }
@@ -75,7 +75,7 @@ public class ServiceItemService {
         homeService.setTitle(serviceItemDTO.getTitle());
         homeService.setBasePrice(serviceItemDTO.getBasePrice());
         homeService.setDescription(serviceItemDTO.getDescription());
-        homeService.setServiceTypeId(serviceItemDTO.getCategory());
+        homeService.setServiceType(serviceItemDTO.getCategory());
         homeService.setCreatorUser(serviceItemDTO.getCreatorUser());
         return this.save(homeService);
     }

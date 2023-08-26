@@ -28,7 +28,7 @@ public class ServiceType extends BaseModel {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "serviceTypeId", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "serviceType", fetch=FetchType.LAZY)
     private Set<ServiceItem> homeService;
 
 }

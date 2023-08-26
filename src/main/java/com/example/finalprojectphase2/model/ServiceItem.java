@@ -1,6 +1,8 @@
 package com.example.finalprojectphase2.model;
 
 import com.example.finalprojectphase2.model.base.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +13,9 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @Table(
         name = "Service_Item", schema = "psn1",
         uniqueConstraints = @UniqueConstraint(columnNames = {"title"})
@@ -35,7 +40,7 @@ public class ServiceItem extends BaseModel {
 
     @ManyToOne
     @JoinColumn(name = "service_type_id")
-    private ServiceType serviceTypeId;
+    private ServiceType serviceType;
 
 }
 
