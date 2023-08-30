@@ -30,8 +30,14 @@ public class ServiceTypeController {
         serviceTypeService.delete(serviceTypeService.findByTitle(serviceTypeTitle));
     }
 
-    @PostMapping(value = "/update-service-type")
-    public void updateServiceType(ServiceType serviceType) {
-        serviceTypeService.update(serviceType);
+    @PutMapping(value = "/update-service-type")
+    public ResponseEntity<?> updateServiceType(ServiceType serviceType) {
+        return ResponseEntity.ok(serviceTypeService.save(serviceType));
     }
+
+    //todo
+//    @PutMapping(value = "/add-service-item/")
+//    public ResponseEntity<?> addServiceItem(ServiceTypeDTO payload) {
+//        return ResponseEntity.ok(serviceTypeService.save(serviceType));
+//    }
 }

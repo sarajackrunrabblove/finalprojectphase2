@@ -17,17 +17,17 @@ public class OfferController {
 
 
     @PostMapping(value = "/create-offer")
-    public ResponseEntity<?> createOffer(OfferDTO offer) {
+    public ResponseEntity<?> createOffer(@RequestBody  OfferDTO offer) {
         return ResponseEntity.ok(offerService.addNewOffer(offer));
     }
 
     @GetMapping(value = "/get-offer")
-    public ResponseEntity<?> getOffer(Long customerId) {
+    public ResponseEntity<?> getOffer(@RequestParam  Long customerId) {
         return ResponseEntity.ok(offerService.findByCustomerId(customerId));
     }
 
     @DeleteMapping(value = "/delete-offer")
-    public void deleteOffer(Long customerId) {
+    public void deleteOffer(@RequestParam Long customerId) {
         offerService.delete(offerService.findByCustomerId(customerId));
     }
 

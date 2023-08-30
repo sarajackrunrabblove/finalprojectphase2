@@ -19,22 +19,22 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping(value = "/create-order")
-    public ResponseEntity<Order> createOrder(OrderDTO order) {
+    public ResponseEntity<Order> createOrder(@RequestBody  OrderDTO order) {
         return ResponseEntity.ok(orderService.newOrder(order));
     }
 
     @GetMapping(value = "/get-order")
-    public ResponseEntity<Order> getOrder(Long customerId) {
+    public ResponseEntity<Order> getOrder(@RequestParam Long customerId) {
         return ResponseEntity.ok(orderService.findByCustomerId(customerId));
     }
 
     @DeleteMapping(value = "/delete-order")
-    public void deleteOrder(Long customerId) {
+    public void deleteOrder(@RequestParam Long customerId) {
         orderService.delete(orderService.findByCustomerId(customerId));
     }
 
     @PostMapping(value = "/update-order")
-    public void updateOrder(Order order) {
+    public void updateOrder(@RequestBody Order order) {
         orderService.update(order);
     }
 
@@ -46,9 +46,16 @@ public class OrderController {
     ) {
         return orderService.showOffersByPriceAndExpertRate(orderId, price, expertRate);
     }
-
+// دیدن سفارشات در وضعیت انتظار پیشنهاد مختصص
     @GetMapping(value = "/showOffersByExpert")
     public List<Order> showOffersByExpert(@RequestParam Long expertId) {
         return orderService.showOffersByExpert(expertId);
     }
+    @PostMapping(value = "/rateExpertFinalOffer")
+    public ResponseEntity<?> rateExpertFinalOffer(@RequestParam Long orderId, @RequestParam Integer rate, @RequestParam String description) {
+        Order byId = orderService.findById(orderId);
+        orderService.rateExpertFinalOffer(byId, rate, description);
+        return  ResponseEntity.ok("امیتاز به متخصص مربوطه انجام شد ");
+    }
+
 }

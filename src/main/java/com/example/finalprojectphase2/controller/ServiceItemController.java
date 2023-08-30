@@ -30,7 +30,7 @@ public class ServiceItemController {
         serviceItemService.delete(serviceItemService.findByTitle(serviceItemTitle));
     }
 
-    @PostMapping(value = "/update-service-item")
+    @PutMapping(value = "/update-service-item")
     public void updateServiceItem(ServiceItem serviceItem) {
         serviceItemService.update(serviceItem);
     }

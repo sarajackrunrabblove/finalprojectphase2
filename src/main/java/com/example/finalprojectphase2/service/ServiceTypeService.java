@@ -27,11 +27,6 @@ public class ServiceTypeService {
         return this.repository.save(category);
     }
 
-    
-    public void update(ServiceType category) {
-        this.repository.save(category);
-    }
-
     public void delete(Long id) {
         ServiceType category = this.repository.findById(id).orElseThrow();
         this.repository.delete(category);
@@ -68,10 +63,11 @@ public class ServiceTypeService {
     }
 
     public ServiceType createCategory(ServiceTypeDTO serviceTypeDTO) {
-        if (!serviceTypeDTO.getCreatorUser().getRole().equals(UserRole.ADMIN)) {
-            logger.error("You don't have permission to create category!");
-            return null;
-        }
+        //todo: add in next phase
+//        if (!serviceTypeDTO.getCreatorUser().getRole().equals(UserRole.ADMIN)) {
+//            logger.error("You don't have permission to create category!");
+//            return null;
+//        }
         ServiceType category = new ServiceType();
         category.setTitle(serviceTypeDTO.getTitle());
         category.setDescription(serviceTypeDTO.getDescription());
@@ -89,7 +85,7 @@ public class ServiceTypeService {
         category.setTitle(title);
         category.setDescription(description);
         category.setModifierUser(modifierUser);
-        this.update(category);
+        this.save(category);
     }
 
     @Transactional

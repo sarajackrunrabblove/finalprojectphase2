@@ -12,11 +12,13 @@ import org.springframework.stereotype.Component;
 public class CustomerPaymentUtil {
     private final UserRepository userRepository;
 
-    public ResponseEntity<Object> payWithCredit(Order order) {
+    public void payWithCredit(Order order) {
 
         Float customerCredit = order.getCustomer().getCredit();
-        if (customerCredit < order.getFinalOffer().getOfferedPrice())
-            return ResponseEntity.internalServerError().body("  وجه اعتبار شما کمتر ازمبلغ پرداختی میباشد لطفا ابتدا اعتبار خود را افزایش دهید");
+        if (customerCredit < order.getFinalOffer().getOfferedPrice()) {
+            ResponseEntity.internalServerError().body("  وجه اعتبار شما کمتر ازمبلغ پرداختی میباشد لطفا ابتدا اعتبار خود را افزایش دهید");
+            return;
+        }
 
         float finalCustomerCredit = customerCredit - order.getFinalOffer().getOfferedPrice();
         userRepository.findByUserName(order.getCustomer().getUserName()).ifPresent(
@@ -28,33 +30,23 @@ public class CustomerPaymentUtil {
         userRepository.findByUserName(order.getFinalOffer().getExpert().getUserName()).ifPresent(
                 user -> {
                     float expertNewCredit = user.getCredit() + order.getFinalOffer().getOfferedPrice();
-                    user.setCredit(expertNewCredit);
+                    user.setCredit(expertNewCredit + user.getCredit());
                     userRepository.save(user);
                 }
         );
-        return ResponseEntity.accepted().body("پرداخت با موفقیت انجام شد");
+        ResponseEntity.accepted().body("پرداخت با موفقیت انجام شد");
     }
 
-    public ResponseEntity<Object> payOnline(Order order) {
+    public void payOnline(Order order) {
 
-        Float customerCredit = order.getCustomer().getCredit();
-        if (customerCredit < order.getFinalOffer().getOfferedPrice())
-            return ResponseEntity.internalServerError().body("  وجه اعتبار شما کمتر ازمبلغ پرداختی میباشد لطفا ابتدا اعتبار خود را افزایش دهید");
 
-        float finalCustomerCredit = customerCredit - order.getFinalOffer().getOfferedPrice();
-        userRepository.findByUserName(order.getCustomer().getUserName()).ifPresent(
-                user -> {
-                    user.setCredit(finalCustomerCredit);
-                    userRepository.save(user);
-                }
-        );
         userRepository.findByUserName(order.getFinalOffer().getExpert().getUserName()).ifPresent(
                 user -> {
-                    float expertNewCredit = user.getCredit() + order.getFinalOffer().getOfferedPrice();
-                    user.setCredit(expertNewCredit);
+                    float expertNewCredit = order.getFinalOffer().getOfferedPrice() * 7 / 10;
+                    user.setCredit(expertNewCredit + user.getCredit());
                     userRepository.save(user);
                 }
         );
-        return ResponseEntity.accepted().body("پرداخت با موفقیت انجام شد");
+        ResponseEntity.accepted().body("پرداخت با موفقیت انجام شد");
     }
 }

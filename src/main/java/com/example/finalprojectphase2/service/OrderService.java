@@ -12,7 +12,6 @@ import com.example.finalprojectphase2.util.CustomerPaymentUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -131,11 +130,12 @@ public class OrderService {
         );
     }
 
-    public ResponseEntity<Object> payForExperts(Order order, PaymentSelection paymentSelection) {
-        if (paymentSelection.equals(PaymentSelection.PayWithCredit)) {
-            return customerPaymentUtil.payWithCredit(order);
+    public void payForExperts(Order order, String paymentType) {
+        if (paymentType.equals(PaymentSelection.PayWithCredit.toString())) {
+            customerPaymentUtil.payWithCredit(order);
+            return;
         }
-        return customerPaymentUtil.payOnline(order);
+        customerPaymentUtil.payOnline(order);
     }
 
     public List<Offer> showOffersByPriceAndExpertRate(Long orderId, Float price, Integer expertRate) {
