@@ -14,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ServiceItemService {
     private final ServiceItemRepository homeServiceRepository;
+    private final ServiceTypeService serviceTypeService;
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(ServiceItemService.class);
 
@@ -28,8 +30,13 @@ public class ServiceItemService {
     }
 
     
-    public void update(ServiceItem homeService) {
-        this.homeServiceRepository.save(homeService);
+    public ServiceItem update(Long id, ServiceItemDTO homeService) {
+        ServiceItem item = this.findById(id);
+        item.setTitle(homeService.getTitle());
+        item.setBasePrice(homeService.getBasePrice());
+        item.setDescription(homeService.getDescription());
+        item.setServiceType(serviceTypeService.findById(homeService.getCategoryId()));
+        return this.homeServiceRepository.save(item);
     }
 
     public void delete(ServiceItem homeService) {
@@ -67,16 +74,16 @@ public class ServiceItemService {
     }
 
     public ServiceItem createService(ServiceItemDTO serviceItemDTO) {
-        if (!serviceItemDTO.getCreatorUser().getRole().equals(UserRole.ADMIN)) {
-            logger.error("You don't have permission to create homeService!");
-            return null;
-        }
+//        if (!serviceItemDTO.getCreatorUser().getRole().equals(UserRole.ADMIN)) {
+//            logger.error("You don't have permission to create homeService!");
+//            return null;
+//        }
+        ServiceType type = serviceTypeService.findById(serviceItemDTO.getCategoryId());
         ServiceItem homeService = new ServiceItem();
         homeService.setTitle(serviceItemDTO.getTitle());
         homeService.setBasePrice(serviceItemDTO.getBasePrice());
         homeService.setDescription(serviceItemDTO.getDescription());
-        homeService.setServiceType(serviceItemDTO.getCategory());
-        homeService.setCreatorUser(serviceItemDTO.getCreatorUser());
+        homeService.setServiceType(type);
         return this.save(homeService);
     }
 
@@ -106,7 +113,7 @@ public class ServiceItemService {
         serviceItem.getExperts().add(expert);
         expert.setModifierUser(modifierUser);
         expert.getExpertSkills().add(serviceItem);
-        this.update(serviceItem);
+        this.save(serviceItem);
         userService.save(expert);
     }
 

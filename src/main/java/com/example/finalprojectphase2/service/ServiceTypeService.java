@@ -27,6 +27,14 @@ public class ServiceTypeService {
         return this.repository.save(category);
     }
 
+    public ServiceType update(Long id, ServiceTypeDTO category) {
+        ServiceType serviceType = this.findById(id);
+        serviceType.setTitle(category.getTitle());
+        serviceType.setDescription(category.getDescription());
+        return this.repository.save(serviceType);
+    }
+
+
     public void delete(Long id) {
         ServiceType category = this.repository.findById(id).orElseThrow();
         this.repository.delete(category);
@@ -51,10 +59,10 @@ public class ServiceTypeService {
     }
 
     public ServiceType createCategory(String title, String description, User creatorUser) {
-        if (!creatorUser.getRole().equals(UserRole.ADMIN)) {
-            logger.error("You don't have permission to create category!");
-            return null;
-        }
+//        if (!creatorUser.getRole().equals(UserRole.ADMIN)) {
+//            logger.error("You don't have permission to create category!");
+//            return null;
+//        }
         ServiceType category = new ServiceType();
         category.setTitle(title);
         category.setDescription(description);
@@ -71,16 +79,15 @@ public class ServiceTypeService {
         ServiceType category = new ServiceType();
         category.setTitle(serviceTypeDTO.getTitle());
         category.setDescription(serviceTypeDTO.getDescription());
-        category.setCreatorUser(serviceTypeDTO.getCreatorUser());
         return this.save(category);
     }
 
     @Transactional
     public void modifyCategory(Long categoryId, String title, String description, User modifierUser) {
-        if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
-            logger.error("You don't have permission to modify category!");
-            return;
-        }
+//        if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
+//            logger.error("You don't have permission to modify category!");
+//            return;
+//        }
         ServiceType category = this.findById(categoryId);
         category.setTitle(title);
         category.setDescription(description);
@@ -90,10 +97,10 @@ public class ServiceTypeService {
 
     @Transactional
     public void addCategoryService(ServiceType category, ServiceItem service, User modifierUser) {
-        if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
-            logger.error("You don't have permission to add service to category!");
-            return;
-        }
+//        if (!modifierUser.getRole().equals(UserRole.ADMIN)) {
+//            logger.error("You don't have permission to add service to category!");
+//            return;
+//        }
         category.setModifierUser(modifierUser);
         category.getHomeService().add(service);
         this.save(category);

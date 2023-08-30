@@ -11,8 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceTypeDTO {
-
     private String title;
     private String description;
-    private User creatorUser;
 }

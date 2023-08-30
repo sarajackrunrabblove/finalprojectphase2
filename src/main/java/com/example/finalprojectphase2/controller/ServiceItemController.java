@@ -15,23 +15,34 @@ public class ServiceItemController {
 
     private final ServiceItemService serviceItemService;
 
+
+    @GetMapping
+    public ResponseEntity<?> findAll() {
+        return ResponseEntity.ok(serviceItemService.findAll());
+    }
+
     @PostMapping(value = "/create-service-item")
-    public ResponseEntity<?> createServiceItem(ServiceItemDTO serviceItem) {
+    public ResponseEntity<?> createServiceItem(@RequestBody ServiceItemDTO serviceItem) {
         return ResponseEntity.ok(serviceItemService.createService(serviceItem));
     }
 
-    @GetMapping(value = "/get-service-item")
-    public ResponseEntity<?> getServiceItem(String serviceItemTitle) {
+    @GetMapping(value = "/get-service-item-by-title/{serviceItemTitle}")
+    public ResponseEntity<?> getServiceItemByTitle(@PathVariable String serviceItemTitle) {
         return ResponseEntity.ok(serviceItemService.findByTitle(serviceItemTitle));
     }
 
-    @DeleteMapping(value = "/delete-service-item")
-    public void deleteServiceItem(String serviceItemTitle) {
-        serviceItemService.delete(serviceItemService.findByTitle(serviceItemTitle));
+    @GetMapping(value = "/get-service-item-by-id/{id}")
+    public ResponseEntity<?> getServiceItemById(@PathVariable Long id) {
+        return ResponseEntity.ok(serviceItemService.findById(id));
     }
 
-    @PutMapping(value = "/update-service-item")
-    public void updateServiceItem(ServiceItem serviceItem) {
-        serviceItemService.update(serviceItem);
+    @DeleteMapping(value = "/delete-service-item/{id}")
+    public void deleteServiceItem(@PathVariable Long id) {
+        serviceItemService.delete(serviceItemService.findById(id));
+    }
+
+    @PutMapping(value = "/update-service-item/{id}")
+    public ResponseEntity<?> updateServiceItem(@PathVariable Long id ,@RequestBody ServiceItemDTO serviceItem) {
+        return ResponseEntity.ok(serviceItemService.update(id, serviceItem));
     }
 }

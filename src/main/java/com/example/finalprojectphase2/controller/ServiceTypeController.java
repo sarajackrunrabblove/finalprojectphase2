@@ -15,29 +15,33 @@ public class ServiceTypeController {
 
     private final ServiceTypeService serviceTypeService;
 
+    @GetMapping
+    public ResponseEntity<?> findAll() {
+        return ResponseEntity.ok(serviceTypeService.findAll());
+    }
+
     @PostMapping(value = "/create-service-type")
-    public ResponseEntity<?> createServiceType(ServiceTypeDTO serviceType) {
+    public ResponseEntity<?> createServiceType(@RequestBody ServiceTypeDTO serviceType) {
         return ResponseEntity.ok(serviceTypeService.createCategory(serviceType));
     }
 
-    @GetMapping(value = "/get-service-type")
-    public ResponseEntity<?> getServiceType(String serviceTypeTitle) {
+    @GetMapping(value = "/get-service-type-by-title/{serviceTypeTitle}")
+    public ResponseEntity<?> getServiceType(@PathVariable String serviceTypeTitle) {
         return ResponseEntity.ok(serviceTypeService.findByTitle(serviceTypeTitle));
     }
 
-    @DeleteMapping(value = "/delete-service-type")
-    public void deleteServiceType(String serviceTypeTitle) {
-        serviceTypeService.delete(serviceTypeService.findByTitle(serviceTypeTitle));
+    @GetMapping(value = "/get-service-type-by-id/{id}")
+    public ResponseEntity<?> getServiceItemById(@PathVariable Long id) {
+        return ResponseEntity.ok(serviceTypeService.findById(id));
     }
 
-    @PutMapping(value = "/update-service-type")
-    public ResponseEntity<?> updateServiceType(ServiceType serviceType) {
-        return ResponseEntity.ok(serviceTypeService.save(serviceType));
+    @DeleteMapping(value = "/delete-service-type/{id}")
+    public void deleteServiceType(@PathVariable Long id) {
+        serviceTypeService.delete(serviceTypeService.findById(id));
     }
 
-    //todo
-//    @PutMapping(value = "/add-service-item/")
-//    public ResponseEntity<?> addServiceItem(ServiceTypeDTO payload) {
-//        return ResponseEntity.ok(serviceTypeService.save(serviceType));
-//    }
+    @PutMapping(value = "/update-service-type/{id}")
+    public ResponseEntity<?> updateServiceType(@PathVariable Long id, @RequestBody ServiceTypeDTO serviceType) {
+        return ResponseEntity.ok(serviceTypeService.update(id, serviceType));
+    }
 }
